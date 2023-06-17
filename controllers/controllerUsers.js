@@ -1,8 +1,15 @@
 const { students } = require("../students");
 const { v4: uuidv4 } = require("uuid");
 
+let authToken = null;
+
+const getAuth = (req, res) => {
+  authToken = uuidv4();
+  res.status(200).json({response: true, token: 'Bearer ' + authToken})
+};
+
 const getAllUsers = (req, res) => {
-  res.status(200).send({ response: true, data: students });
+  res.status(200).json({ response: true, data: students });
   console.log("Usuarios cargados");
 };
 
@@ -52,31 +59,18 @@ const getUserByLastNameOrMajor = (req, res) => {
 const createUser = (req, res) => {
   const { first_name, last_name, age, email, major } = req.body;
   const gpa = parseFloat(req.body.gpa).toFixed(1);
-  if (
-    !first_name ||
-    !last_name ||
-    !age ||
-    !email ||
-    !major ||
-    !gpa ||
-    gpa < 0 ||
-    gpa > 4
-  ) {
-    res.status(400).send({ response: false, error: "Missing student data" });
-  } else {
-    const newUser = {
-      student_id: uuidv4(),
-      first_name: first_name,
-      last_name: last_name,
-      age: age,
-      email: email,
-      major: major,
-      gpa: gpa,
-    };
-    students.push(newUser);
-    console.log("Usuario añadido");
-    res.status(201).send({ response: true, data: newUser });
-  }
+  const newUser = {
+    student_id: uuidv4(),
+    first_name: first_name,
+    last_name: last_name,
+    age: age,
+    email: email,
+    major: major,
+    gpa: gpa,
+  };
+  students.push(newUser);
+  console.log("Usuario añadido");
+  res.status(201).send({ response: true, data: newUser });
 };
 
 const replaceUser = (req, res) => {
@@ -143,5 +137,6 @@ module.exports = {
   createUser,
   replaceUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getAuth
 };
